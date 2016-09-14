@@ -50,6 +50,12 @@ instance (Sexpable a, Sexpable b, Sexpable c) => Sexpable (a, b, c) where
 instance Sexpable Sexp where
   toSexp = id
 
+cons :: Sexp -> Sexp -> Sexp
+cons (Symbol x) (List xs)  = List ((Symbol x):xs)
+cons (Atom x)   (List xs)  = List ((Atom x):xs)
+cons (List xs)  (List xs') = List ((List xs):xs')
+cons x          y          = List [x, y]
+
 lispnize :: Sexp -> String
 lispnize (List xs) = "(" ++ (intercalate " " (map lispnize xs)) ++ ")"
 lispnize (Atom x) = BL.unpack x
@@ -58,7 +64,7 @@ lispnize (Symbol x) = BL.unpack x
 getHomeR :: Handler RepPlain
 getHomeR = return $ RepPlain $ toContent $ lispnize sexp
   where
-    sexp = toSexp True
+    sexp = cons (toSym "list") (toSexp [1::Int, 2, 3])
 
 main :: IO ()
 main = warp 3000 HelloWorld
