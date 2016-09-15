@@ -11,7 +11,7 @@ import qualified Data.ByteString.Lazy.Char8 as BL
 data HelloWorld = HelloWorld
 
 mkYesod "HelloWorld" [parseRoutes|
-/ HomeR GET
+/ HomeR GET OPTIONS
 |]
 
 instance Yesod HelloWorld
@@ -62,9 +62,17 @@ lispnize (Atom x) = BL.unpack x
 lispnize (Symbol x) = BL.unpack x
 
 getHomeR :: Handler RepPlain
-getHomeR = return $ RepPlain $ toContent $ lispnize sexp
+getHomeR = do
+  addHeader "Access-Control-Allow-Origin" "*"
+  return $ RepPlain $ toContent $ lispnize sexp
   where
     sexp = cons (toSym "list") (toSexp [1::Int, 2, 3])
+
+optionsHomeR :: Handler RepPlain
+optionsHomeR = do
+    addHeader "Access-Control-Allow-Origin" "*"
+    addHeader "Access-Control-Allow-Methods" "GET, OPTIONS"
+    return $ RepPlain ""
 
 main :: IO ()
 main = warp 3000 HelloWorld
