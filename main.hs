@@ -8,13 +8,13 @@ import           Yesod
 import Data.List
 import qualified Data.ByteString.Lazy.Char8 as BL
 
-data HelloWorld = HelloWorld
+data SexpServer = SexpServer
 
-mkYesod "HelloWorld" [parseRoutes|
+mkYesod "SexpServer" [parseRoutes|
 / HomeR GET OPTIONS
 |]
 
-instance Yesod HelloWorld
+instance Yesod SexpServer
 
 data Sexp = List [Sexp] | Atom BL.ByteString | Symbol BL.ByteString deriving (Show, Eq)
 
@@ -75,4 +75,4 @@ optionsHomeR = do
     return $ RepPlain ""
 
 main :: IO ()
-main = warp 3000 HelloWorld
+main = warp 3000 SexpServer
